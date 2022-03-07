@@ -1,0 +1,27 @@
+version: '3.3'
+
+services:
+  app:
+    build:
+      dockerfile: ./docker/php/Dockerfile
+      context: .
+    volumes:
+      - ./:/app:rw
+    networks:
+      - goldenhands
+    env_file:
+      - .env
+
+  nginx:
+    image: nginx:1.18-alpine
+    volumes:
+        - ./docker/nginx:/etc/nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      - goldenhands
+
+networks:
+  goldenhands:
+    driver: bridge
