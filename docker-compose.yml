@@ -7,7 +7,8 @@ services:
       context: .
     volumes:
       - ./:/app:rw
-    restart: always
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+    restart: unless-stopped
     networks:
       - goldenhands
     env_file:
@@ -17,7 +18,7 @@ services:
     image: nginx:1.18-alpine
     volumes:
       - ./docker/nginx:/etc/nginx
-    restart: always
+    restart: unless-stopped
     ports:
       - '80:80'
       - '81:81'
@@ -32,12 +33,28 @@ services:
     volumes:
       - ./frontend:/app
       - node_modules:/app/node_modules
-    restart: always
+    restart: unless-stopped
     networks:
       - goldenhands
+
+  db:
+    image: postgres:14.2-alpine
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    networks:
+      - goldenhands
+    environment:
+      POSTGRES_USER: developer
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: goldenhands
 
 networks:
   goldenhands:
 
 volumes:
+  db-data:
+  redis-data:
   node_modules:

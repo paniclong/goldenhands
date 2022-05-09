@@ -1,6 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\V1\ProductController;
+use App\Modules\Auth\Http\Controllers\V1\LoginController;
+use App\Modules\Auth\Http\Controllers\V1\RegisterController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +16,46 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::namespace('V1')->prefix('v1')->group(static function () {
+    Route::group(['prefix' => 'users'], static function () {
+        Route::get('/', static function () {
+            return response('Список всех пользователей');
+        });
+
+        Route::get('/{id}', static function () {
+            return response('Получить пользователя по id');
+        });
+
+        Route::post('/', static function () {
+            return response('Создать нового пользователя');
+        });
+
+        Route::patch('/', static function () {
+            return response('Изменить параметры пользователя');
+        });
+
+        Route::delete('/', static function () {
+            return response('Удалить пользователя');
+        });
+    });
+
+    Route::middleware(['auth.jwt'])
+        ->prefix('products')
+        ->group(
+            static function () {
+                Route::get('/', [ProductController::class, 'list']);
+                Route::get('/{product_id}', [ProductController::class, 'getById']);
+            }
+        );
+
+    Route::namespace('Modules\Auth')
+        ->prefix('auth')
+        ->group(
+            static function () {
+                Route::get('/me', [LoginController::class, 'me']);
+                Route::post('/register', [RegisterController::class, 'register']);
+                Route::post('/login', [LoginController::class, 'loginByEmailAndPassword']);
+                Route::get('/refresh', [LoginController::class, 'refreshToken']);
+            }
+        );
 });

@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Entity\Product;
+use App\Entity\ProductConfig;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,6 +15,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+         ProductConfig::factory(10)->create()->each(static function (ProductConfig $productConfig) {
+            Product::factory()->create(['config_id' => $productConfig->getId()]);
+         });
     }
 }
